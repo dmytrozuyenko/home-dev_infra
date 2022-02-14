@@ -10,7 +10,6 @@ pipeline {
            sh "echo 'access_key = \"${aws_access}\"\nsecret_key = \"${aws_secret}\"' > terraform.tfvars"
          }
          sh "terraform fmt"
-         sh "terraform validate"
          sh "terraform init -input=false"
        }
      }
