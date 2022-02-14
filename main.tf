@@ -13,37 +13,37 @@ resource "aws_vpc" "main" {
   cidr_block           = "10.1.0.0/16"
 }
 
-# resource "aws_security_group" "main" {
-#   name        = "home"
-#   vpc_id      = aws_vpc.main.id
+resource "aws_security_group" "main" {
+  name        = "home"
+  vpc_id      = aws_vpc.main.id
 
-#   egress {
-#     from_port        = 0
-#     to_port          = 0
-#     protocol         = "-1"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+ }
 
-#   ingress {
-#     from_port = 22
-#     to_port   = 22
-#     protocol  = "tcp"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#   }
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
   
-#   ingress {
-#     from_port = 8080
-#     to_port   = 8080
-#     protocol  = "tcp"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#   }
-#   ingress {
-#     from_port = 5432
-#     to_port   = 5432
-#     protocol  = "tcp"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#   }
-# }
+  ingress {
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+}
 
 # RDS
 
@@ -52,14 +52,14 @@ resource "aws_vpc" "main" {
 # 
 
 
-# resource "aws_ecs_cluster" "main" {
-#   name = "home"
+resource "aws_ecs_cluster" "main" {
+  name = "home"
 
-#   setting {
-#     name  = "containerInsights"
-#     value = "enabled"
-#   }
-# }
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+}
 
 # resource "aws_ecs_service" "mongo" {
 #   name            = "mongodb"
