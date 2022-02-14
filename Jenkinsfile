@@ -41,8 +41,9 @@ pipeline {
 //       }
 //     }  
 //   }
+  }
   
-//   post {
+  post {
 //     success {            
 //       withCredentials([string(credentialsId: 'telegram-token-home-ui-infra', variable: 'telegram_token'), string(credentialsId: 'telegram-chatid-home-ui-infra', variable: 'telegram_chatid')]) {
 //         sh  ("""
@@ -64,8 +65,8 @@ pipeline {
 //         """)
 //       }
 //     }
-//     always {
-//     deleteDir()
-//     }    
+    always {
+    deleteDir()
+    }    
   }
 }
