@@ -9,37 +9,31 @@ pipeline {
          withCredentials([usernamePassword(credentialsId: 'aws-auth', passwordVariable: 'aws_secret', usernameVariable: 'aws_access')]) {
            sh "echo 'access_key = \"${aws_access}\"\nsecret_key = \"${aws_secret}\"' > terraform.tfvars"
          }
-         sh "terraform fmt"
          sh "terraform init -input=false"
        }
      }
 
-//    stage('destroy') {
-//      steps {
-//        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-//          sh "terraform destroy --auto-approve -no-color"
-//        }
-//      }  
-//    }
+   stage('destroy') {
+     steps {
+       catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+         sh "terraform destroy --auto-approve -no-color"
+       }
+     }  
+   }
   
-    stage('apply') {
-      steps {
-        sh "terraform apply --auto-approve -no-color"
-//         sh "terraform output home | tr -d \'\"\' >> ./ansible/hosts"
-      }
-    }
+//     stage('apply') {
+//       steps {
+//         sh "terraform apply --auto-approve -no-color"
+// //         sh "terraform output home | tr -d \'\"\' >> ./ansible/hosts"
+//       }
+//     }
     
 //     stage('config') {
 //       steps {
-// //         withCredentials([sshUserPrivateKey(credentialsId: "aws-key-infra", keyFileVariable: 'aws_key')]) {
-//           sh 'whoami'
-// //            sh 'ansible-playbook -i ./ansible/hosts ./ansible/playbook.yml -u ubuntu --key-file "${aws_key}"'
-
-// //         }
-//         sh 'ansible-playbook -i ./ansible/hosts ./ansible/playbook.yml -u ubuntu --key-file ./home.pem'
+//         withAWS(credentials: 'aws_auth_keys', region: 'us-east-2') {
+          
 //       }
 //     }  
-//   }
   }
   
   post {
