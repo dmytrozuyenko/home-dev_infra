@@ -6,11 +6,10 @@ pipeline {
   stages {
      stage('init') {
        steps {
-         sh 'hey'
-//         withCredentials([usernamePassword(credentialsId: 'aws-auth', passwordVariable: 'aws_secret', usernameVariable: 'aws_access')]) {
-//           sh "echo 'access_key = \"${aws_access}\"\nsecret_key = \"${aws_secret}\"' > terraform.tfvars"
-//         }
-//         sh "terraform init -input=false"
+         withCredentials([usernamePassword(credentialsId: 'aws-auth', passwordVariable: 'aws_secret', usernameVariable: 'aws_access')]) {
+           sh "echo 'access_key = \"${aws_access}\"\nsecret_key = \"${aws_secret}\"' > terraform.tfvars"
+         }
+         sh "terraform init -input=false"
        }
      }
 
@@ -22,12 +21,12 @@ pipeline {
 //      }  
 //    }
   
-//     stage('apply') {
-//       steps {
-//         sh "terraform apply --auto-approve -no-color"
-//         sh "terraform output home-ui | tr -d \'\"\' >> ./ansible/hosts"
-//       }
-//     }
+    stage('apply') {
+      steps {
+        sh "terraform apply --auto-approve -no-color"
+//         sh "terraform output home | tr -d \'\"\' >> ./ansible/hosts"
+      }
+    }
     
 //     stage('config') {
 //       steps {
