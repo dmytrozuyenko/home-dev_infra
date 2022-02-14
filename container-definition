@@ -1,0 +1,21 @@
+{
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "containerDefinitions": [
+    {
+      "name": "home-application",
+      "image": "209998915568.dkr.ecr.us-east-2.amazonaws.com/home-application:latest",
+      "memory": 512,
+      "cpu": 256,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+    }
+  ],
+  "networkMode": "main",
+}
