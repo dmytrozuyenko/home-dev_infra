@@ -10,7 +10,7 @@ pipeline {
            sh "echo 'access_key = \"${aws_access}\"\nsecret_key = \"${aws_secret}\"' > terraform.tfvars"
          }
          withCredentials([string(credentialsId: 'postgres-auth', variable: 'db_password')]) {
-           sh "echo '\ndb_password = \"${db_password}\"' >> terraform.tfvars"
+           sh "echo 'db_password = \"${db_password}\"' >> terraform.tfvars"
          }
          sh 'cat terraform.tfvars'
          sh "terraform init -input=false"
