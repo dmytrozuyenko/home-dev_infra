@@ -12,7 +12,7 @@ pipeline {
          withCredentials([string(credentialsId: 'postgres-auth', variable: 'db_password')]) {
            sh "echo '\ndb_password = \"${db_password}\"' >> terraform.tfvars"
          }
-         sh 'echo "terraform.tfvars"'
+         sh 'cat terraform.tfvars'
          sh "terraform init -input=false"
        }
      }
