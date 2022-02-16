@@ -1,5 +1,6 @@
 variable "access_key"{}
 variable "secret_key"{}
+variable "db_password"{}
 
 
 provider "aws" {
@@ -8,78 +9,129 @@ provider "aws" {
  secret_key = var.secret_key
 }
 
-
-resource "aws_vpc" "main" {
-  cidr_block           = "10.1.0.0/16"
+data "aws_availability_zones" "available_zones" {
+  state = "available"
 }
 
-resource "aws_security_group" "main" {
-  name        = "home"
-  vpc_id      = aws_vpc.main.id
+resource "aws_vpc" "home" {
+  cidr_block = "10.1.0.0/16"
+}
+
+resource "aws_subnet" "public" {
+  count                   = 2
+  cidr_block              = cidrsubnet(aws_vpc.home.cidr_block, 8, 2 + count.index)
+  availability_zone       = data.aws_availability_zones.available_zones.names[count.index]
+  vpc_id                  = aws_vpc.home.id
+  map_public_ip_on_launch = true
+}
+
+resource "aws_subnet" "private" {
+  count             = 2
+  cidr_block        = cidrsubnet(aws_vpc.home.cidr_block, 8, count.index)
+  availability_zone = data.aws_availability_zones.available_zones.names[count.index]
+  vpc_id            = aws_vpc.home.id
+}
+
+resource "aws_internet_gateway" "gateway" {
+  vpc_id = aws_vpc.home.id
+}
+
+resource "aws_route" "internet_access" {
+  route_table_id         = aws_vpc.home.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gateway.id
+}
+
+resource "aws_eip" "gateway" {
+  count      = 2
+  vpc        = true
+  depends_on = [aws_internet_gateway.gateway]
+}
+
+resource "aws_nat_gateway" "gateway" {
+  count         = 2
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = element(aws_eip.gateway.*.id, count.index)
+}
+
+resource "aws_route_table" "private" {
+  count  = 2
+  vpc_id = aws_vpc.home.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.gateway.*.id, count.index)
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = 2
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
+}
+
+resource "aws_security_group" "lb" {
+  name        = "home-alb-security-group"
+  vpc_id      = aws_vpc.home.id
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
- }
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-  
-  ingress {
-    from_port = 8080
-    to_port   = 8080
-    protocol  = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-# RDS
+resource "aws_lb" "home" {
+  name            = "home-lb"
+  subnets         = aws_subnet.public.*.id
+  security_groups = [aws_security_group.lb.id]
+}
 
-# ECS
-# HOME-APPLICATION
-# 
+resource "aws_lb_target_group" "home-application" {
+  name        = "home-application-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.home.id
+  target_type = "ip"
+}
 
+resource "aws_lb_listener" "home-application" {
+  load_balancer_arn = aws_lb.home.id
+  port              = "8080"
+  protocol          = "HTTP"
 
-resource "aws_ecs_cluster" "main" {
-  name = "home"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
+  default_action {
+    target_group_arn = aws_lb_target_group.home-application.id
+    type             = "forward"
   }
 }
 
-# resource "aws_ecs_service" "mongo" {
-#   name            = "mongodb"
-#   cluster         = aws_ecs_cluster.foo.id
-#   task_definition = aws_ecs_task_definition.mongo.arn
-#   desired_count   = 3
-#   iam_role        = aws_iam_role.foo.arn
-#   depends_on      = [aws_iam_role_policy.foo]
+resource "aws_lb_target_group" "data-migration" {
+  name        = "data-migration-target-group"
+  port        = 5001
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.home.id
+  target_type = "ip"
+}
 
-#   ordered_placement_strategy {
-#     type  = "binpack"
-#     field = "cpu"
-#   }
+resource "aws_lb_listener" "data-migration" {
+  load_balancer_arn = aws_lb.home.id
+  port              = "5001"
+  protocol          = "HTTP"
 
-#   placement_constraints {
-#     type       = "memberOf"
-#     expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
-#   }
-# }
-
+  default_action {
+    target_group_arn = aws_lb_target_group.data-migration.id
+    type             = "forward"
+  }
+}
 
 
 
@@ -93,5 +145,3 @@ resource "aws_ecs_cluster" "main" {
 #     ManagedBy   = "Terraform"
 #   }
 # }
-
-# data "aws_region" "current" {}
