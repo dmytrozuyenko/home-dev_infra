@@ -17,20 +17,20 @@ pipeline {
        }
      }
 
-   stage('destroy') {
-     steps {
-       catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-         sh "terraform destroy --auto-approve -no-color"
-       }
-     }  
-   }
+//    stage('destroy') {
+//      steps {
+//        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+//          sh "terraform destroy --auto-approve -no-color"
+//        }
+//      }  
+//    }
   
-//     stage('apply') {
-//       steps {
-//         sh "terraform apply --auto-approve -no-color"
-//         sh "terraform output load_balancer_ip"
-//       }
-//     }
+    stage('apply') {
+      steps {
+        sh "terraform apply --auto-approve -no-color"
+        sh "terraform output load_balancer_ip"
+      }
+    }
     
 //     stage('update') {
 //       steps {
@@ -41,7 +41,7 @@ pipeline {
 //     }  
   }
   
-  post {
+//   post {
 //     success {            
 //       withCredentials([string(credentialsId: 'telegram-token-home-dev-infra', variable: 'telegram_token'), string(credentialsId: 'telegram-chatid-home-dev-infra', variable: 'telegram_chatid')]) {
 //         sh  ("""
@@ -63,8 +63,8 @@ pipeline {
 //         """)
 //       }
 //     }
-    always {
-    deleteDir()
-    }    
+//     always {
+//     deleteDir()
+//     }    
   }
 }
