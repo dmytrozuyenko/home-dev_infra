@@ -59,7 +59,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.home.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = element(aws_nat_gateway.gateway.*.id, count.index)
   }
 }
@@ -82,9 +82,9 @@ resource "aws_security_group" "db" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -101,9 +101,9 @@ resource "aws_security_group" "lb" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -151,16 +151,3 @@ resource "aws_lb_listener" "data-migration" {
     type             = "forward"
   }
 }
-
-
-
-
-# locals {
-#   prefix = "${var.prefix}-${terraform.workspace}"
-#   common_tags = {
-#     Environment = terraform.workspace
-#     Project     = var.project
-#     Owner       = var.contact
-#     ManagedBy   = "Terraform"
-#   }
-# }
