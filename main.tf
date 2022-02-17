@@ -20,12 +20,12 @@ resource "aws_vpc" "home" {
 resource "aws_subnet" "public" {
   cidr_block              = "10.1.1.0/24"
   map_public_ip_on_launch = true
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = aws_vpc.home.id
 }
 
 resource "aws_subnet" "private" {
   cidr_block        = "10.1.2.0/24"
-  vpc_id            = aws_vpc.main.id
+  vpc_id            = aws_vpc.home.id
 }
 
 resource "aws_internet_gateway" "gateway" {
