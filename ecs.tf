@@ -91,7 +91,7 @@ resource "aws_ecs_task_definition" "data-migration" {
     "name": "data-migration",
     "networkMode": "awsvpc",
     "environment": [
-        {"name": "DATASOURCE_URL", "value": "dbc:postgresql://postgres:5432/postgres?user=postgres&password=p0$tgr3$"}
+        {"name": "DATASOURCE_URL", "value": "jdbc:postgresql://postgres:5432/postgres?user=postgres&password=p0$tgr3$"}
     ],
     "portMappings": [
       {
