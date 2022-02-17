@@ -1,7 +1,7 @@
 
 resource "aws_security_group" "ecs_service" {
   name        = "home-ecs-service"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.home.id
 
   egress {
     from_port   = 8080
@@ -14,9 +14,6 @@ resource "aws_security_group" "ecs_service" {
     from_port = 5432
     to_port   = 5432
     protocol  = "tcp"
-    cidr_blocks = [
-      aws_subnet.private.cidr_block,
-    ]
   }
 
   ingress {
