@@ -39,31 +39,22 @@ resource "aws_route" "internet_access" {
 }
 
 resource "aws_eip" "gateway" {
-  count      = 2
   vpc        = true
   depends_on = [aws_internet_gateway.gateway]
 }
 
 resource "aws_nat_gateway" "gateway" {
-  count         = 2
-  subnet_id     = element(aws_subnet.public.*.id, count.index)
-  allocation_id = element(aws_eip.gateway.*.id, count.index)
+  allocation_id = aws_eip.gateway.id
+  subnet_id     = aws_subnet.public.id
 }
 
 resource "aws_route_table" "private" {
-  count  = 2
   vpc_id = aws_vpc.home.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = element(aws_nat_gateway.gateway.*.id, count.index)
-  }
 }
 
 resource "aws_route_table_association" "private" {
-  count          = 2
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(aws_route_table.private.*.id, count.index)
+  subnet_id      = aws_subnet.private.id
+  route_table_id = aws_route_table.private.id
 }
 
 resource "aws_security_group" "lb" {
