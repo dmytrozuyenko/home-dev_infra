@@ -1,5 +1,5 @@
-resource "aws_security_group" "ecs_service" {
-  name        = "home-ecs-service"
+resource "aws_security_group" "home-ecs" {
+  name        = "home-ecs"
   vpc_id      = aws_vpc.home.id
 
   egress {
@@ -9,10 +9,18 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   
-  egress {
+    egress {
     from_port = 5432
     to_port   = 5432
     protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    from_port = 5001
+    to_port   = 5001
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -85,9 +93,6 @@ resource "aws_ecs_task_definition" "data-migration" {
     "memory": 256,
     "name": "data-migration",
     "networkMode": "awsvpc",
-    "environment": [
-        {"name": "DATASOURCE_URL", "value": "jdbc:postgresql://postgres:5432/postgres?user=postgres&password=p0$tgr3$"}
-    ],
     "portMappings": [
       {
         "containerPort": 5001,
@@ -97,6 +102,25 @@ resource "aws_ecs_task_definition" "data-migration" {
   }
 ]
 DEFINITION
+}
+
+resource "aws_security_group" "data-migration_task" {
+  name        = "data-migration-task-security-group"
+  vpc_id      = aws_vpc.home.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 5001
+    to_port         = 5001
+    security_groups = [aws_security_group.lb.id]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_ecs_cluster" "home" {
@@ -143,23 +167,4 @@ resource "aws_ecs_service" "data-migration" {
   }
 
   depends_on = [aws_lb_listener.data-migration]
-}
-
-resource "aws_security_group" "data-migration_task" {
-  name        = "data-migration-task-security-group"
-  vpc_id      = aws_vpc.home.id
-
-  ingress {
-    protocol        = "tcp"
-    from_port       = 5001
-    to_port         = 5001
-    security_groups = [aws_security_group.lb.id]
-  }
-
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
