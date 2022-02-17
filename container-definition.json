@@ -12,5 +12,9 @@
       "image": "209998915568.dkr.ecr.us-east-2.amazonaws.com/home-application:latest",
       "essential": true,
       "name": "home-application"
+      "environment" : [
+        { "name" : "DATASOURCE_URL", 
+          "value" : "jdbc:postgresql://postgres:5432/postgres?user=postgres&password=p0$tgr3$" }
+    ]
     }
 ]
