@@ -70,6 +70,25 @@ resource "aws_route_table_association" "private" {
   route_table_id = element(aws_route_table.private.*.id, count.index)
 }
 
+resource "aws_security_group" "db" {
+  name        = "db-security-group"
+  vpc_id      = aws_vpc.home.id
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 5432
+    to_port     = 5432
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "lb" {
   name        = "home-alb-security-group"
   vpc_id      = aws_vpc.home.id
