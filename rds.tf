@@ -1,6 +1,5 @@
 resource "aws_db_instance" "postgres" {
   identifier             = "postgres"
-  endpoint               = "postgres:5432"
   instance_class         = "db.t3.micro"
   allocated_storage      = 5
   engine                 = "postgres"
