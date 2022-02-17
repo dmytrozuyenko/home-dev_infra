@@ -9,10 +9,6 @@ provider "aws" {
  secret_key = var.secret_key
 }
 
-data "aws_availability_zones" "available_zones" {
-  state = "available"
-}
-
 resource "aws_vpc" "home" {
   cidr_block = "10.1.0.0/16"
 }
