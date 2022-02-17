@@ -26,12 +26,12 @@ pipeline {
      }  
    }
   
-    stage('apply') {
-      steps {
-        sh "terraform apply --auto-approve -no-color"
-        sh "terraform output load_balancer_ip"
-      }
-    }
+//     stage('apply') {
+//       steps {
+//         sh "terraform apply --auto-approve -no-color"
+//         sh "terraform output load_balancer_ip"
+//       }
+//     }
     
 //     stage('update') {
 //       steps {
