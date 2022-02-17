@@ -14,7 +14,6 @@ pipeline {
          }
          sh "terraform init -input=false"
          sh "terraform validate"
-         sh "terraform plan"
        }
      }
 
@@ -26,12 +25,12 @@ pipeline {
 //      }  
 //    }
   
-//     stage('apply') {
-//       steps {
-//         sh "terraform apply --auto-approve -no-color"
-//         sh "terraform output load_balancer_ip"
-//       }
-//     }
+    stage('apply') {
+      steps {
+        sh "terraform apply --auto-approve -no-color"
+        sh "terraform output load_balancer_ip"
+      }
+    }
     
 //     stage('update') {
 //       steps {
