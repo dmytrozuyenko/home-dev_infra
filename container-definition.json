@@ -15,6 +15,6 @@
       "environment" : [
         { "name" : "DATASOURCE_URL", 
           "value" : "jdbc:postgresql://postgres:5432/postgres?user=postgres&password=p0$tgr3$" }
-    ]
+      ]
     }
 ]
