@@ -136,7 +136,7 @@ resource "aws_ecs_service" "home-application" {
 
   network_configuration {
     security_groups = [aws_security_group.home-application_task.id]
-    subnets         = aws_subnet.private.id
+    subnets         = aws_subnet.private.*.id
   }
 
   load_balancer {
@@ -157,7 +157,7 @@ resource "aws_ecs_service" "data-migration" {
 
   network_configuration {
     security_groups = [aws_security_group.data-migration_task.id]
-    subnets         = aws_subnet.private.id
+    subnets         = aws_subnet.private.*.id
   }
 
   load_balancer {
